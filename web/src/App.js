@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import api from "./services/api";
 import "./global.css";
 import "./App.css";
 import "./Sidebar.css";
 import "./Main.css";
 
 function App() {
+  const [devs, setDevs] = useState([]);
   const [github_username, setGithubUsername] = useState("");
   const [techs, setTechs] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -22,8 +24,24 @@ function App() {
     );
   }, []);
 
+  useEffect(() => {
+    async function loadDevs() {
+      const { data } = await api.get("/devs");
+      setDevs(data);
+    }
+    loadDevs();
+  }, []);
+
   async function handleAddDev(e) {
     e.preventDefault();
+    const { data } = await api.post("/devs", {
+      github_username,
+      techs,
+      latitude,
+      longitude
+    });
+    setGithubUsername("");
+    setTechs("");
   }
 
   return (
@@ -81,101 +99,19 @@ function App() {
 
       <main>
         <ul>
-          <li className="dev-item">
-            <header>
-              <img
-                src="https://avatars0.githubusercontent.com/u/12229149?s=460&v=4"
-                alt=""
-              />
-              <div className="user-info">
-                <strong>Lucasffm</strong>
-                <span>ReactJS, React Native, Node.JS</span>
-              </div>
-            </header>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque et
-              sed aut, esse quo voluptas alias quia dolores illum beatae error,
-              corporis rerum vitae accusantium sapiente, cupiditate assumenda
-              qui accusamus?
-            </p>
-            <a href="http://github.com/lucasffm">Github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img
-                src="https://avatars0.githubusercontent.com/u/12229149?s=460&v=4"
-                alt=""
-              />
-              <div className="user-info">
-                <strong>Lucasffm</strong>
-                <span>ReactJS, React Native, Node.JS</span>
-              </div>
-            </header>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque et
-              sed aut, esse quo voluptas alias quia dolores illum beatae error,
-              corporis rerum vitae accusantium sapiente, cupiditate assumenda
-              qui accusamus?
-            </p>
-            <a href="http://github.com/lucasffm">Github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img
-                src="https://avatars0.githubusercontent.com/u/12229149?s=460&v=4"
-                alt=""
-              />
-              <div className="user-info">
-                <strong>Lucasffm</strong>
-                <span>ReactJS, React Native, Node.JS</span>
-              </div>
-            </header>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque et
-              sed aut, esse quo voluptas alias quia dolores illum beatae error,
-              corporis rerum vitae accusantium sapiente, cupiditate assumenda
-              qui accusamus?
-            </p>
-            <a href="http://github.com/lucasffm">Github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img
-                src="https://avatars0.githubusercontent.com/u/12229149?s=460&v=4"
-                alt=""
-              />
-              <div className="user-info">
-                <strong>Lucasffm</strong>
-                <span>ReactJS, React Native, Node.JS</span>
-              </div>
-            </header>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque et
-              sed aut, esse quo voluptas alias quia dolores illum beatae error,
-              corporis rerum vitae accusantium sapiente, cupiditate assumenda
-              qui accusamus?
-            </p>
-            <a href="http://github.com/lucasffm">Github</a>
-          </li>
-          <li className="dev-item">
-            <header>
-              <img
-                src="https://avatars0.githubusercontent.com/u/12229149?s=460&v=4"
-                alt=""
-              />
-              <div className="user-info">
-                <strong>Lucasffm</strong>
-                <span>ReactJS, React Native, Node.JS</span>
-              </div>
-            </header>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque et
-              sed aut, esse quo voluptas alias quia dolores illum beatae error,
-              corporis rerum vitae accusantium sapiente, cupiditate assumenda
-              qui accusamus?
-            </p>
-            <a href="http://github.com/lucasffm">Github</a>
-          </li>
+          {devs.map(dev => (
+            <li className="dev-item" key={dev._id}>
+              <header>
+                <img src={dev.avatar_url} alt="" />
+                <div className="user-info">
+                  <strong>{dev.name}</strong>
+                  <span>{dev.techs.join(", ")}</span>
+                </div>
+              </header>
+              <p>{dev.bio || "Sem bio"}</p>
+              <a href={`http://github.com/${dev.github_username}`}>Github</a>
+            </li>
+          ))}
         </ul>
       </main>
     </div>
